@@ -100,17 +100,6 @@ public class Targeting {
         return myTeam != null && otherTeam != null && myTeam.isSameTeam(otherTeam);
     }
 
-    private static boolean isFriendlyPlayer(Entity caster, Entity target) {
-
-        if (areEntitiesEqual(caster, target))
-            return true;
-
-        // Currently the only friendly player check is if the caster and target are on the same team
-        if (isSameTeam(caster, target))
-            return true;
-
-        return false;
-    }
 
     private static boolean isPlayerControlled(Entity target) {
         Entity controller = target.getControllingPassenger();
@@ -128,19 +117,21 @@ public class Targeting {
         return false;
     }
 
-    private static boolean isFriendlyPlayerControlled(Entity caster, Entity target) {
+
+
+    private static boolean targetIsPlayerControlled(Entity caster, Entity target,
+                                                    BiFunction<Entity, Entity, Boolean> test){
         Entity controller = target.getControllingPassenger();
         if (controller instanceof PlayerEntity) {
-            return isValidFriendly(caster, controller);
+            return test.apply(caster, controller);
         }
-
         if (target instanceof TameableEntity) {
             TameableEntity ownable = (TameableEntity) target;
 
             Entity owner = ownable.getOwner();
             if (owner != null) {
                 // Owner is online, perform the normal checks
-                return isValidFriendly(caster, owner);
+                return test.apply(caster, owner);
             } else if (ownable.getOwnerId() != null) {
                 // Entity is owned, but the owner is offline
                 // If the owner if offline then there's not much we can do.
@@ -151,10 +142,11 @@ public class Targeting {
         return false;
     }
 
-    private static boolean casterIsFriendlyPlayerControlled(Entity caster, Entity target){
+    private static boolean casterIsPlayerControlled(Entity caster, Entity target,
+                                                    BiFunction<Entity, Entity, Boolean> test){
         Entity controller = caster.getControllingPassenger();
         if (controller instanceof PlayerEntity) {
-            return isValidFriendly(controller, target);
+            return test.apply(controller, target);
         }
 
         if (target instanceof TameableEntity) {
@@ -162,7 +154,7 @@ public class Targeting {
             Entity owner = ownable.getOwner();
             if (owner != null) {
                 // Owner is online, perform the normal checks
-                return isValidFriendly(owner, target);
+                return test.apply(owner, target);
             } else if (ownable.getOwnerId() != null) {
                 // Entity is owned, but the owner is offline
                 // If the owner if offline then there's not much we can do.
@@ -175,7 +167,26 @@ public class Targeting {
     }
 
 
-    private static boolean isVanillaFriendly(Entity caster, Entity target){
+    private static boolean checkIndirectEnemy(Entity caster, Entity target){
+        // can't be enemy with self
+        if (areEntitiesEqual(caster, target)){
+            return false;
+        }
+
+        // can't be enemy with entities on same team
+        if (isSameTeam(caster, target)){
+            return false;
+        }
+
+        if (targetIsPlayerControlled(caster, target, Targeting::isValidEnemy)){
+            return true;
+        }
+
+        return casterIsPlayerControlled(caster, target, Targeting::isValidEnemy);
+    }
+
+
+    private static boolean checkIndirectFriendly(Entity caster, Entity target){
         // Always friendly with ourselves
         if (areEntitiesEqual(caster, target)) {
             return true;
@@ -186,54 +197,38 @@ public class Targeting {
             return true;
         }
 
-        if (isFriendlyPlayer(caster, target))
+        if (targetIsPlayerControlled(caster, target, Targeting::isValidFriendly))
             return true;
 
-        if (isFriendlyPlayerControlled(caster, target))
-            return true;
-
-        return casterIsFriendlyPlayerControlled(caster, target);
+        return casterIsPlayerControlled(caster, target, Targeting::isValidFriendly);
     }
 
     private static boolean isValidFriendly(Entity caster, Entity target) {
 
-        if (isVanillaFriendly(caster, target)){
+        if (checkIndirectFriendly(caster, target)){
             return true;
         }
-
 
         TargetRelation relation = getTargetRelation(caster, target);
-        if (relation == TargetRelation.FRIEND){
-            return true;
-        }
-
-        return false;
+        return relation == TargetRelation.FRIEND;
     }
 
     private static boolean isValidEnemy(Entity caster, Entity target) {
-        if (isVanillaFriendly(caster, target)){
-            return false;
-        }
-
-        TargetRelation relation = getTargetRelation(caster, target);
-        if (relation == TargetRelation.ENEMY){
+        if (checkIndirectEnemy(caster, target)){
             return true;
         }
 
-        return false;
+        TargetRelation relation = getTargetRelation(caster, target);
+        return relation == TargetRelation.ENEMY;
     }
 
     private static boolean isValidNeutral(Entity caster, Entity target){
-        if (isVanillaFriendly(caster, target)){
+        if (checkIndirectFriendly(caster, target) || checkIndirectEnemy(caster, target)){
             return false;
         }
 
         TargetRelation relation = getTargetRelation(caster, target);
-        if (relation == TargetRelation.NEUTRAL || relation == TargetRelation.UNHANDLED){
-            return true;
-        }
-
-        return false;
+        return relation == TargetRelation.NEUTRAL || relation == TargetRelation.UNHANDLED;
     }
 
 }
