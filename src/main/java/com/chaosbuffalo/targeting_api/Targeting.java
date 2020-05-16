@@ -6,6 +6,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.scoreboard.Team;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.function.BiFunction;
 
 public class Targeting {
@@ -27,9 +28,7 @@ public class Targeting {
         FRIENDLY,
         PLAYERS,
         SELF,
-        NEUTRAL,
-        ENEMY_INCLUDE_NEUTRAL,
-        FRIENDLY_INCLUDE_NEUTRAL
+        NEUTRAL
     }
 
     private static boolean areEntitiesEqual(Entity first, Entity second) {
@@ -48,6 +47,16 @@ public class Targeting {
 
     public static void registerRelationCallback(BiFunction<Entity, Entity, TargetRelation> callback) {
         relationCallbacks.add(callback);
+    }
+
+    public static boolean isValidTarget(EnumSet<TargetType> typeSet, Entity caster, Entity target,
+                                        boolean excludeCaster){
+        for (TargetType type : typeSet){
+            if (isValidTarget(type, caster, target, excludeCaster)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isValidTarget(TargetType type, Entity caster, Entity target, boolean excludeCaster) {
@@ -85,10 +94,6 @@ public class Targeting {
                 return isValidEnemy(caster, target);
             case NEUTRAL:
                 return isValidNeutral(caster, target);
-            case ENEMY_INCLUDE_NEUTRAL:
-                return isValidEnemy(caster, target) || isValidNeutral(caster, target);
-            case FRIENDLY_INCLUDE_NEUTRAL:
-                return isValidFriendly(caster, target) || isValidNeutral(caster, target);
         }
         return false;
     }
