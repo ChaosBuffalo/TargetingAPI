@@ -208,7 +208,7 @@ public class Targeting {
         return casterIsPlayerControlled(caster, target, Targeting::isValidFriendly);
     }
 
-    private static boolean isValidFriendly(Entity caster, Entity target) {
+    public static boolean isValidFriendly(Entity caster, Entity target) {
 
         if (checkIndirectFriendly(caster, target)){
             return true;
@@ -218,7 +218,7 @@ public class Targeting {
         return relation == TargetRelation.FRIEND;
     }
 
-    private static boolean isValidEnemy(Entity caster, Entity target) {
+    public static boolean isValidEnemy(Entity caster, Entity target) {
         if (checkIndirectEnemy(caster, target)){
             return true;
         }
@@ -227,7 +227,7 @@ public class Targeting {
         return relation == TargetRelation.ENEMY;
     }
 
-    private static boolean isValidNeutral(Entity caster, Entity target){
+    public static boolean isValidNeutral(Entity caster, Entity target){
         if (checkIndirectFriendly(caster, target) || checkIndirectEnemy(caster, target)){
             return false;
         }
