@@ -31,6 +31,11 @@ public class TargetingContext<T extends Entity> implements ITargetingContext {
         this(clazz, true, targetTest);
     }
 
+    public TargetingContext(TargetingContext<T> context){
+        this(context.clazz, context.requiresAlive, context.acceptSelf, context.canBeCreative,
+                context.canBeSpectator, context.targetTest);
+    }
+
     public TargetingContext<T> setCanBeCreative(boolean canBeCreative) {
         this.canBeCreative = canBeCreative;
         return this;
