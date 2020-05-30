@@ -23,4 +23,14 @@ credits="Developed by the MK Ultra Team" #optional
 description='''
 A Targeting API to assist modders in determining entity relationships.
 '''
-
+[[dependencies.targeting_api]] #optional
+    # the modid of the dependency
+    modId="forge" #mandatory
+    # Does this dependency have to exist - if not, ordering below must be specified
+    mandatory=true #mandatory
+    # The version range of the dependency
+    versionRange="[31,)" #mandatory
+    # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
+    ordering="NONE"
+    # Side this dependency is applied on - BOTH, CLIENT or SERVER
+    side="BOTH"

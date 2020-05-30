@@ -7,6 +7,8 @@ import net.minecraft.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.BiFunction;
 
 public class Targeting {
@@ -15,6 +17,26 @@ public class Targeting {
     private static final ArrayList<BiFunction<Entity, Entity, TargetRelation>> relationCallbacks =
             new ArrayList<>();
 
+    public static final TargetingContext<LivingEntity> ALL = new TargetingContext<>(LivingEntity.class,
+            false, (caster, target) -> true);
+    public static final TargetingContext<LivingEntity> ALL_NO_SELF = new TargetingContext<>(LivingEntity.class,
+            true, (caster, target) -> true);
+    public static final TargetingContext<LivingEntity> SELF = new TargetingContext<>(LivingEntity.class,
+            false, Targeting::areEntitiesEqual);
+    public static final TargetingContext<PlayerEntity> PLAYERS = new TargetingContext<>(PlayerEntity.class,
+            false, (caster, target) -> true);
+    public static final TargetingContext<PlayerEntity> PLAYERS_NO_SELF = new TargetingContext<>(PlayerEntity.class,
+            true, (caster, target) -> true);
+    public static final TargetingContext<LivingEntity> FRIENDLY = new TargetingContext<>(LivingEntity.class,
+            false, Targeting::isValidFriendly);
+    public static final TargetingContext<LivingEntity> FRIENDLY_NO_SELF = new TargetingContext<>(LivingEntity.class,
+            true, Targeting::isValidFriendly);
+    public static final TargetingContext<LivingEntity> ENEMY = new TargetingContext<>(LivingEntity.class,
+            false, Targeting::isValidEnemy);
+    public static final TargetingContext<LivingEntity> NEUTRAL = new TargetingContext<>(LivingEntity.class,
+            false, Targeting::isValidNeutral);
+
+
     public enum TargetRelation {
         FRIEND,
         ENEMY,
@@ -22,16 +44,7 @@ public class Targeting {
         UNHANDLED
     }
 
-    public enum TargetType {
-        ALL,
-        ENEMY,
-        FRIENDLY,
-        PLAYERS,
-        SELF,
-        NEUTRAL
-    }
-
-    private static boolean areEntitiesEqual(Entity first, Entity second) {
+    public static boolean areEntitiesEqual(Entity first, Entity second) {
         return first != null && second != null && first.getUniqueID().compareTo(second.getUniqueID()) == 0;
     }
 
@@ -49,53 +62,9 @@ public class Targeting {
         relationCallbacks.add(callback);
     }
 
-    public static boolean isValidTarget(EnumSet<TargetType> typeSet, Entity caster, Entity target,
-                                        boolean excludeCaster){
-        for (TargetType type : typeSet){
-            if (isValidTarget(type, caster, target, excludeCaster)){
-                return true;
-            }
-        }
-        return false;
-    }
 
-    public static boolean isValidTarget(TargetType type, Entity caster, Entity target, boolean excludeCaster) {
-        if (caster == null || target == null) {
-            return false;
-        }
-        if (!(target instanceof LivingEntity)){
-            return false;
-        }
-        if (excludeCaster && areEntitiesEqual(caster, target)) {
-            return false;
-        }
-        // Targets should be alive
-        if (!target.isAlive())
-            return false;
-
-        // Ignore spectators
-        if (target.isSpectator())
-            return false;
-
-        // Ignore Creative Mode players
-        if (target instanceof PlayerEntity && ((PlayerEntity) target).isCreative())
-            return false;
-
-        switch (type) {
-            case ALL:
-                return true;
-            case SELF:
-                return areEntitiesEqual(caster, target);
-            case PLAYERS:
-                return target instanceof PlayerEntity;
-            case FRIENDLY:
-                return isValidFriendly(caster, target);
-            case ENEMY:
-                return isValidEnemy(caster, target);
-            case NEUTRAL:
-                return isValidNeutral(caster, target);
-        }
-        return false;
+    public static boolean isValidTarget(ITargetingContext context, Entity caster, Entity target) {
+        return context.test(caster, target);
     }
 
 
