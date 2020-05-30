@@ -6,9 +6,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.scoreboard.Team;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.BiFunction;
 
 public class Targeting {
@@ -64,7 +61,7 @@ public class Targeting {
 
 
     public static boolean isValidTarget(ITargetingContext context, Entity caster, Entity target) {
-        return context.test(caster, target);
+        return context.isValidTarget(caster, target);
     }
 
 

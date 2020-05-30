@@ -33,7 +33,7 @@ public class TargetingContext<T extends Entity> implements ITargetingContext {
     }
 
     @Override
-    public boolean test(Entity caster, Entity target) {
+    public boolean isValidTarget(Entity caster, Entity target) {
         if (caster == null || target == null) {
             return false;
         }

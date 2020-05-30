@@ -4,6 +4,6 @@ import net.minecraft.entity.Entity;
 
 public interface ITargetingContext {
 
-    boolean test(Entity caster, Entity target);
+    boolean isValidTarget(Entity caster, Entity target);
 
 }
