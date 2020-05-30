@@ -16,22 +16,21 @@ public class Targeting {
 
     public static final TargetingContext<LivingEntity> ALL = new TargetingContext<>(LivingEntity.class,
             (caster, target) -> true);
-    public static final TargetingContext<LivingEntity> ALL_AROUND = new TargetingContext<>(LivingEntity.class,
-            false, (caster, target) -> true);
+    public static final TargetingContext<LivingEntity> ALL_AROUND = new TargetingContext<>(ALL).setAcceptSelf(false);
     public static final TargetingContext<LivingEntity> SELF = new TargetingContext<>(LivingEntity.class,
             Targeting::areEntitiesEqual);
     public static final TargetingContext<PlayerEntity> PLAYERS = new TargetingContext<>(PlayerEntity.class,
             (caster, target) -> true);
-    public static final TargetingContext<PlayerEntity> PLAYERS_AROUND = new TargetingContext<>(PlayerEntity.class,
-            false, (caster, target) -> true);
+    public static final TargetingContext<PlayerEntity> PLAYERS_AROUND = new TargetingContext<>(PLAYERS)
+            .setAcceptSelf(false);
     public static final TargetingContext<LivingEntity> FRIENDLY = new TargetingContext<>(LivingEntity.class,
             Targeting::isValidFriendly);
-    public static final TargetingContext<LivingEntity> FRIENDLY_AROUND = new TargetingContext<>(LivingEntity.class,
-            false, Targeting::isValidFriendly);
+    public static final TargetingContext<LivingEntity> FRIENDLY_AROUND = new TargetingContext<>(FRIENDLY)
+            .setAcceptSelf(false);
     public static final TargetingContext<LivingEntity> ENEMY = new TargetingContext<>(LivingEntity.class,
-            false, Targeting::isValidEnemy);
+            Targeting::isValidEnemy).setAcceptSelf(false);
     public static final TargetingContext<LivingEntity> NEUTRAL = new TargetingContext<>(LivingEntity.class,
-            false, Targeting::isValidNeutral);
+            Targeting::isValidNeutral).setAcceptSelf(false);
 
 
     public enum TargetRelation {

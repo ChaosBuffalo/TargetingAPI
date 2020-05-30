@@ -17,7 +17,7 @@ public class TargetingContext<T extends Entity> implements ITargetingContext {
         return clazz.isInstance(target);
     }
 
-    public TargetingContext(Class<T> clazz, boolean requiresAlive, boolean acceptSelf, boolean canBeCreative,
+    private TargetingContext(Class<T> clazz, boolean requiresAlive, boolean acceptSelf, boolean canBeCreative,
                             boolean canBeSpectator, BiFunction<Entity, Entity, Boolean> targetTest){
         this.clazz = clazz;
         this.requiresAlive = requiresAlive;
@@ -30,6 +30,7 @@ public class TargetingContext<T extends Entity> implements ITargetingContext {
     public TargetingContext(Class<T> clazz, BiFunction<Entity, Entity, Boolean> targetTest){
         this(clazz, true, targetTest);
     }
+
 
     public TargetingContext(TargetingContext<T> context){
         this(context.clazz, context.requiresAlive, context.acceptSelf, context.canBeCreative,
@@ -61,7 +62,7 @@ public class TargetingContext<T extends Entity> implements ITargetingContext {
         return this;
     }
 
-    public TargetingContext(Class<T> clazz, boolean acceptSelf, BiFunction<Entity, Entity, Boolean> targetTest){
+    private TargetingContext(Class<T> clazz, boolean acceptSelf, BiFunction<Entity, Entity, Boolean> targetTest){
         this(clazz, true, acceptSelf, false, false, targetTest);
     }
 
