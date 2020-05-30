@@ -1,6 +1,5 @@
 package com.chaosbuffalo.targeting_api;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.scoreboard.Team;
@@ -13,24 +12,6 @@ public class Targeting {
 
     private static final ArrayList<BiFunction<Entity, Entity, TargetRelation>> relationCallbacks =
             new ArrayList<>();
-
-    public static final TargetingContext<LivingEntity> ALL = new TargetingContext<>(LivingEntity.class,
-            (caster, target) -> true);
-    public static final TargetingContext<LivingEntity> ALL_AROUND = new TargetingContext<>(ALL).setAcceptSelf(false);
-    public static final TargetingContext<LivingEntity> SELF = new TargetingContext<>(LivingEntity.class,
-            Targeting::areEntitiesEqual);
-    public static final TargetingContext<PlayerEntity> PLAYERS = new TargetingContext<>(PlayerEntity.class,
-            (caster, target) -> true);
-    public static final TargetingContext<PlayerEntity> PLAYERS_AROUND = new TargetingContext<>(PLAYERS)
-            .setAcceptSelf(false);
-    public static final TargetingContext<LivingEntity> FRIENDLY = new TargetingContext<>(LivingEntity.class,
-            Targeting::isValidFriendly);
-    public static final TargetingContext<LivingEntity> FRIENDLY_AROUND = new TargetingContext<>(FRIENDLY)
-            .setAcceptSelf(false);
-    public static final TargetingContext<LivingEntity> ENEMY = new TargetingContext<>(LivingEntity.class,
-            Targeting::isValidEnemy).setAcceptSelf(false);
-    public static final TargetingContext<LivingEntity> NEUTRAL = new TargetingContext<>(LivingEntity.class,
-            Targeting::isValidNeutral).setAcceptSelf(false);
 
 
     public enum TargetRelation {
@@ -59,7 +40,7 @@ public class Targeting {
     }
 
 
-    public static boolean isValidTarget(ITargetingContext context, Entity caster, Entity target) {
+    public static boolean isValidTarget(TargetingContext context, Entity caster, Entity target) {
         return context.isValidTarget(caster, target);
     }
 
