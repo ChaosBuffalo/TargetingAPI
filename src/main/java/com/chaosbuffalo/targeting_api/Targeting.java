@@ -15,19 +15,19 @@ public class Targeting {
             new ArrayList<>();
 
     public static final TargetingContext<LivingEntity> ALL = new TargetingContext<>(LivingEntity.class,
-            false, (caster, target) -> true);
+            (caster, target) -> true);
     public static final TargetingContext<LivingEntity> ALL_AROUND = new TargetingContext<>(LivingEntity.class,
-            true, (caster, target) -> true);
-    public static final TargetingContext<LivingEntity> SELF = new TargetingContext<>(LivingEntity.class,
-            false, Targeting::areEntitiesEqual);
-    public static final TargetingContext<PlayerEntity> PLAYERS = new TargetingContext<>(PlayerEntity.class,
             false, (caster, target) -> true);
+    public static final TargetingContext<LivingEntity> SELF = new TargetingContext<>(LivingEntity.class,
+            Targeting::areEntitiesEqual);
+    public static final TargetingContext<PlayerEntity> PLAYERS = new TargetingContext<>(PlayerEntity.class,
+            (caster, target) -> true);
     public static final TargetingContext<PlayerEntity> PLAYERS_AROUND = new TargetingContext<>(PlayerEntity.class,
-            true, (caster, target) -> true);
+            false, (caster, target) -> true);
     public static final TargetingContext<LivingEntity> FRIENDLY = new TargetingContext<>(LivingEntity.class,
-            false, Targeting::isValidFriendly);
+            Targeting::isValidFriendly);
     public static final TargetingContext<LivingEntity> FRIENDLY_AROUND = new TargetingContext<>(LivingEntity.class,
-            true, Targeting::isValidFriendly);
+            false, Targeting::isValidFriendly);
     public static final TargetingContext<LivingEntity> ENEMY = new TargetingContext<>(LivingEntity.class,
             false, Targeting::isValidEnemy);
     public static final TargetingContext<LivingEntity> NEUTRAL = new TargetingContext<>(LivingEntity.class,
