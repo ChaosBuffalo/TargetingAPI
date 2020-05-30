@@ -1,35 +1,63 @@
 package com.chaosbuffalo.targeting_api;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.function.BiFunction;
 
 public class TargetingContext<T extends Entity> implements ITargetingContext {
-    private final boolean excludeSelf;
-    private final boolean requiresAlive;
-    private final boolean canBeSpectator;
-    private final boolean canBeCreative;
+    private boolean acceptSelf;
+    private boolean requiresAlive;
+    private boolean canBeSpectator;
+    private boolean canBeCreative;
     private final Class<T> clazz;
-    private final BiFunction<Entity, Entity, Boolean> targetTest;
+    private BiFunction<Entity, Entity, Boolean> targetTest;
 
     protected boolean isValidClass(Entity target){
         return clazz.isInstance(target);
     }
 
-    public TargetingContext(Class<T> clazz, boolean requiresAlive, boolean excludeSelf, boolean canBeCreative,
+    public TargetingContext(Class<T> clazz, boolean requiresAlive, boolean acceptSelf, boolean canBeCreative,
                             boolean canBeSpectator, BiFunction<Entity, Entity, Boolean> targetTest){
         this.clazz = clazz;
         this.requiresAlive = requiresAlive;
-        this.excludeSelf = excludeSelf;
+        this.acceptSelf = acceptSelf;
         this.canBeCreative = canBeCreative;
         this.canBeSpectator = canBeSpectator;
         this.targetTest = targetTest;
     }
 
-    public TargetingContext(Class<T> clazz, boolean excludeSelf, BiFunction<Entity, Entity, Boolean> targetTest){
-        this(clazz, true, excludeSelf, false, false, targetTest);
+    public TargetingContext(Class<T> clazz, BiFunction<Entity, Entity, Boolean> targetTest){
+        this(clazz, true, targetTest);
+    }
+
+    public TargetingContext<T> setCanBeCreative(boolean canBeCreative) {
+        this.canBeCreative = canBeCreative;
+        return this;
+    }
+
+    public TargetingContext<T> setCanBeSpectator(boolean canBeSpectator) {
+        this.canBeSpectator = canBeSpectator;
+        return this;
+    }
+
+    public TargetingContext<T> setAcceptSelf(boolean acceptSelf) {
+        this.acceptSelf = acceptSelf;
+        return this;
+    }
+
+    public TargetingContext<T> setRequiresAlive(boolean requiresAlive) {
+        this.requiresAlive = requiresAlive;
+        return this;
+    }
+
+    public TargetingContext<T> setTargetTest(BiFunction<Entity, Entity, Boolean> targetTest) {
+        this.targetTest = targetTest;
+        return this;
+    }
+
+    public TargetingContext(Class<T> clazz, boolean acceptSelf, BiFunction<Entity, Entity, Boolean> targetTest){
+        this(clazz, true, acceptSelf, false, false, targetTest);
     }
 
     @Override
@@ -40,7 +68,7 @@ public class TargetingContext<T extends Entity> implements ITargetingContext {
         if (!isValidClass(target)){
             return false;
         }
-        if (excludeSelf && Targeting.areEntitiesEqual(caster, target)){
+        if (!acceptSelf && Targeting.areEntitiesEqual(caster, target)){
             return false;
         }
         if (requiresAlive && !target.isAlive()){

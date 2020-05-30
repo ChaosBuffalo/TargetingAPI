@@ -16,17 +16,17 @@ public class Targeting {
 
     public static final TargetingContext<LivingEntity> ALL = new TargetingContext<>(LivingEntity.class,
             false, (caster, target) -> true);
-    public static final TargetingContext<LivingEntity> ALL_NO_SELF = new TargetingContext<>(LivingEntity.class,
+    public static final TargetingContext<LivingEntity> ALL_AROUND = new TargetingContext<>(LivingEntity.class,
             true, (caster, target) -> true);
     public static final TargetingContext<LivingEntity> SELF = new TargetingContext<>(LivingEntity.class,
             false, Targeting::areEntitiesEqual);
     public static final TargetingContext<PlayerEntity> PLAYERS = new TargetingContext<>(PlayerEntity.class,
             false, (caster, target) -> true);
-    public static final TargetingContext<PlayerEntity> PLAYERS_NO_SELF = new TargetingContext<>(PlayerEntity.class,
+    public static final TargetingContext<PlayerEntity> PLAYERS_AROUND = new TargetingContext<>(PlayerEntity.class,
             true, (caster, target) -> true);
     public static final TargetingContext<LivingEntity> FRIENDLY = new TargetingContext<>(LivingEntity.class,
             false, Targeting::isValidFriendly);
-    public static final TargetingContext<LivingEntity> FRIENDLY_NO_SELF = new TargetingContext<>(LivingEntity.class,
+    public static final TargetingContext<LivingEntity> FRIENDLY_AROUND = new TargetingContext<>(LivingEntity.class,
             true, Targeting::isValidFriendly);
     public static final TargetingContext<LivingEntity> ENEMY = new TargetingContext<>(LivingEntity.class,
             false, Targeting::isValidEnemy);
