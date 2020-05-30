@@ -3,7 +3,7 @@ package com.chaosbuffalo.targeting_api;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 
-import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 
 public class TargetingContext<T extends Entity> implements ITargetingContext {
     private boolean acceptSelf;
@@ -11,14 +11,14 @@ public class TargetingContext<T extends Entity> implements ITargetingContext {
     private boolean canBeSpectator;
     private boolean canBeCreative;
     private final Class<T> clazz;
-    private BiFunction<Entity, Entity, Boolean> targetTest;
+    private BiPredicate<Entity, Entity> targetTest;
 
     protected boolean isValidClass(Entity target){
         return clazz.isInstance(target);
     }
 
     private TargetingContext(Class<T> clazz, boolean requiresAlive, boolean acceptSelf, boolean canBeCreative,
-                            boolean canBeSpectator, BiFunction<Entity, Entity, Boolean> targetTest){
+                             boolean canBeSpectator, BiPredicate<Entity, Entity> targetTest){
         this.clazz = clazz;
         this.requiresAlive = requiresAlive;
         this.acceptSelf = acceptSelf;
@@ -27,7 +27,7 @@ public class TargetingContext<T extends Entity> implements ITargetingContext {
         this.targetTest = targetTest;
     }
 
-    public TargetingContext(Class<T> clazz, BiFunction<Entity, Entity, Boolean> targetTest){
+    public TargetingContext(Class<T> clazz, BiPredicate<Entity, Entity> targetTest){
         this(clazz, true, targetTest);
     }
 
@@ -57,12 +57,12 @@ public class TargetingContext<T extends Entity> implements ITargetingContext {
         return this;
     }
 
-    public TargetingContext<T> setTargetTest(BiFunction<Entity, Entity, Boolean> targetTest) {
+    public TargetingContext<T> setTargetTest(BiPredicate<Entity, Entity> targetTest) {
         this.targetTest = targetTest;
         return this;
     }
 
-    private TargetingContext(Class<T> clazz, boolean acceptSelf, BiFunction<Entity, Entity, Boolean> targetTest){
+    private TargetingContext(Class<T> clazz, boolean acceptSelf, BiPredicate<Entity, Entity> targetTest){
         this(clazz, true, acceptSelf, false, false, targetTest);
     }
 
@@ -89,6 +89,6 @@ public class TargetingContext<T extends Entity> implements ITargetingContext {
             return false;
         }
 
-        return targetTest.apply(caster, target);
+        return targetTest.test(caster, target);
     }
 }
