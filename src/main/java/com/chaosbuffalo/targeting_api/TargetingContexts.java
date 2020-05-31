@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ObjectHolder;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
-public class Contexts {
+public class TargetingContexts {
 
     public static final ResourceLocation ALL_NAME = new ResourceLocation(TargetingAPI.MODID, "contexts.all");
     public static final ResourceLocation ALL_AROUND_NAME = new ResourceLocation(TargetingAPI.MODID, "contexts.all_around");

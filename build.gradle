@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '0.18'
+version = '0.19'
 group = 'com.chaosbuffalo.targeting_api' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'targeting_api'
 
@@ -74,7 +74,7 @@ minecraft {
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
-            args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/')
+            args '--mod', 'targeting_api', '--all', '--output', file('src/generated/resources/')
 
             mods {
                 examplemod {
@@ -115,7 +115,7 @@ dependencies {
 jar {
     manifest {
         attributes([
-            "Specification-Title": "mkwidgets",
+            "Specification-Title": "targeting_api",
             "Specification-Vendor": "chaosbuffalo",
             "Specification-Version": "1", // We are version 1 of ourselves
             "Implementation-Title": project.name,
