@@ -2,18 +2,14 @@ package com.chaosbuffalo.targeting_api;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
-import javax.annotation.Nullable;
 import java.util.function.BiPredicate;
 
-public class TargetingContext implements IForgeRegistryEntry<TargetingContext> {
+public class TargetingContext {
     private boolean acceptSelf;
     private boolean requiresAlive;
     private boolean canBeSpectator;
     private boolean canBeCreative;
-    private ResourceLocation name;
     private final Class<? extends Entity> clazz;
     private BiPredicate<Entity, Entity> targetTest;
 
@@ -21,10 +17,9 @@ public class TargetingContext implements IForgeRegistryEntry<TargetingContext> {
         return clazz.isInstance(target);
     }
 
-    protected <T extends Entity> TargetingContext(Class<T> clazz, ResourceLocation name, boolean requiresAlive,
-                               boolean acceptSelf, boolean canBeCreative,
-                             boolean canBeSpectator, BiPredicate<Entity, Entity> targetTest){
-        setRegistryName(name);
+    protected <T extends Entity> TargetingContext(Class<T> clazz, boolean requiresAlive,
+                                                  boolean acceptSelf, boolean canBeCreative,
+                                                  boolean canBeSpectator, BiPredicate<Entity, Entity> targetTest){
         this.clazz = clazz;
         this.requiresAlive = requiresAlive;
         this.acceptSelf = acceptSelf;
@@ -33,13 +28,13 @@ public class TargetingContext implements IForgeRegistryEntry<TargetingContext> {
         this.targetTest = targetTest;
     }
 
-    public <T extends Entity> TargetingContext(Class<T> clazz, ResourceLocation name, BiPredicate<Entity, Entity> targetTest){
-        this(clazz, name, true, targetTest);
+    public <T extends Entity> TargetingContext(Class<T> clazz, BiPredicate<Entity, Entity> targetTest){
+        this(clazz, true, targetTest);
     }
 
 
-    public TargetingContext(TargetingContext context, ResourceLocation name){
-        this(context.clazz, name, context.requiresAlive, context.acceptSelf, context.canBeCreative,
+    public TargetingContext(TargetingContext context){
+        this(context.clazz, context.requiresAlive, context.acceptSelf, context.canBeCreative,
                 context.canBeSpectator, context.targetTest);
     }
 
@@ -68,8 +63,8 @@ public class TargetingContext implements IForgeRegistryEntry<TargetingContext> {
         return this;
     }
 
-    protected <T extends Entity> TargetingContext(Class<T> clazz, ResourceLocation name, boolean acceptSelf, BiPredicate<Entity, Entity> targetTest){
-        this(clazz, name, true, acceptSelf, false, false, targetTest);
+    protected <T extends Entity> TargetingContext(Class<T> clazz, boolean acceptSelf, BiPredicate<Entity, Entity> targetTest){
+        this(clazz, true, acceptSelf, false, false, targetTest);
     }
 
     public boolean isValidTarget(Entity caster, Entity target) {
@@ -96,23 +91,4 @@ public class TargetingContext implements IForgeRegistryEntry<TargetingContext> {
 
         return targetTest.test(caster, target);
     }
-
-    @Override
-    public TargetingContext setRegistryName(ResourceLocation name) {
-        this.name = name;
-        return this;
-    }
-
-    @Nullable
-    @Override
-    public ResourceLocation getRegistryName() {
-        return name;
-    }
-
-    @Override
-    public Class<TargetingContext> getRegistryType() {
-        return TargetingContext.class;
-    }
-
-
 }
