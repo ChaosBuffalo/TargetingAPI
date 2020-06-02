@@ -63,8 +63,8 @@ public class Targeting {
 
     private static Entity getRootEntity(Entity source) {
         Entity controller = source.getControllingPassenger();
-        if (controller instanceof PlayerEntity) {
-            return controller;
+        if (controller != null) {
+            return getRootEntity(controller);
         }
 
         if (source instanceof TameableEntity) {
@@ -72,7 +72,7 @@ public class Targeting {
             Entity owner = owned.getOwner();
             if (owner != null) {
                 // Owner is online, so use it for relationship checks
-                return owner;
+                return getRootEntity(owner);
             } else if (owned.getOwnerId() != null) {
                 // Entity is owned, but the owner is offline
                 // If the owner if offline then there's not much we can do.
