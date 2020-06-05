@@ -1,8 +1,7 @@
 package com.chaosbuffalo.targeting_api;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -31,7 +30,7 @@ public class Targeting {
         }
 
         // can't be enemy with entities on same team
-        if (isSameTeam(source, target)) {
+        if (source.isOnSameTeam(target)) {
             return TargetRelation.FRIEND;
         }
 
@@ -52,14 +51,6 @@ public class Targeting {
     public static boolean isValidTarget(TargetingContext context, Entity caster, Entity target) {
         return context.isValidTarget(caster, target);
     }
-
-
-    private static boolean isSameTeam(Entity caster, Entity target) {
-        Team myTeam = caster.getTeam();
-        Team otherTeam = target.getTeam();
-        return myTeam != null && otherTeam != null && myTeam.isSameTeam(otherTeam);
-    }
-
 
     private static Entity getRootEntity(Entity source) {
         Entity controller = source.getControllingPassenger();
