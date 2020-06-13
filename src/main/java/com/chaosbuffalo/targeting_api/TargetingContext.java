@@ -13,13 +13,13 @@ public class TargetingContext {
     private final Class<? extends Entity> clazz;
     private BiPredicate<Entity, Entity> targetTest;
 
-    protected boolean isValidClass(Entity target){
+    protected boolean isValidClass(Entity target) {
         return clazz.isInstance(target);
     }
 
     protected <T extends Entity> TargetingContext(Class<T> clazz, boolean requiresAlive,
                                                   boolean acceptSelf, boolean canBeCreative,
-                                                  boolean canBeSpectator, BiPredicate<Entity, Entity> targetTest){
+                                                  boolean canBeSpectator, BiPredicate<Entity, Entity> targetTest) {
         this.clazz = clazz;
         this.requiresAlive = requiresAlive;
         this.acceptSelf = acceptSelf;
@@ -28,12 +28,12 @@ public class TargetingContext {
         this.targetTest = targetTest;
     }
 
-    public <T extends Entity> TargetingContext(Class<T> clazz, BiPredicate<Entity, Entity> targetTest){
+    public <T extends Entity> TargetingContext(Class<T> clazz, BiPredicate<Entity, Entity> targetTest) {
         this(clazz, true, targetTest);
     }
 
 
-    public TargetingContext(TargetingContext context){
+    public TargetingContext(TargetingContext context) {
         this(context.clazz, context.requiresAlive, context.acceptSelf, context.canBeCreative,
                 context.canBeSpectator, context.targetTest);
     }
@@ -43,14 +43,26 @@ public class TargetingContext {
         return this;
     }
 
+    public boolean canBeCreative() {
+        return canBeCreative;
+    }
+
     public TargetingContext setCanBeSpectator(boolean canBeSpectator) {
         this.canBeSpectator = canBeSpectator;
         return this;
     }
 
+    public boolean canBeSpectator() {
+        return canBeSpectator;
+    }
+
     public TargetingContext setAcceptSelf(boolean acceptSelf) {
         this.acceptSelf = acceptSelf;
         return this;
+    }
+
+    public boolean canTargetSelf() {
+        return acceptSelf;
     }
 
     public TargetingContext setRequiresAlive(boolean requiresAlive) {
@@ -63,7 +75,7 @@ public class TargetingContext {
         return this;
     }
 
-    protected <T extends Entity> TargetingContext(Class<T> clazz, boolean acceptSelf, BiPredicate<Entity, Entity> targetTest){
+    protected <T extends Entity> TargetingContext(Class<T> clazz, boolean acceptSelf, BiPredicate<Entity, Entity> targetTest) {
         this(clazz, true, acceptSelf, false, false, targetTest);
     }
 
@@ -71,21 +83,24 @@ public class TargetingContext {
         if (caster == null || target == null) {
             return false;
         }
-        if (!isValidClass(target)){
-            return false;
-        }
-        if (!acceptSelf && Targeting.areEntitiesEqual(caster, target)){
-            return false;
-        }
-        if (requiresAlive && !target.isAlive()){
+
+        if (!isValidClass(target)) {
             return false;
         }
 
-        if (!canBeSpectator && target.isSpectator()){
+        if (!acceptSelf && Targeting.areEntitiesEqual(caster, target)) {
             return false;
         }
 
-        if (!canBeCreative && target instanceof PlayerEntity && ((PlayerEntity) target).isCreative()){
+        if (requiresAlive && !target.isAlive()) {
+            return false;
+        }
+
+        if (!canBeSpectator && target.isSpectator()) {
+            return false;
+        }
+
+        if (!canBeCreative && target instanceof PlayerEntity && ((PlayerEntity) target).isCreative()) {
             return false;
         }
 

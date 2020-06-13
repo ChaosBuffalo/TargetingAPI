@@ -5,9 +5,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.fml.common.Mod;
 
 
-@Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class TargetingContexts {
-    public static TargetingContext ALL = new TargetingContext(LivingEntity.class, (caster, target) -> true);;
+    public static TargetingContext ALL = new TargetingContext(LivingEntity.class, (caster, target) -> true);
     public static TargetingContext ALL_AROUND = new TargetingContext(ALL).setAcceptSelf(false);
     public static TargetingContext PLAYERS = new TargetingContext(PlayerEntity.class, (caster, target) -> true);
     public static TargetingContext PLAYERS_AROUND = new TargetingContext(PLAYERS).setAcceptSelf(false);
