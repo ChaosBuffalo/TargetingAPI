@@ -82,6 +82,10 @@ public class Targeting {
         return relations.contains(relation);
     }
 
+    public static boolean allowAny(Entity caster, Entity target) {
+        return true;
+    }
+
     public static boolean isValidFriendly(Entity caster, Entity target) {
         return validCheck(caster, target, EnumSet.of(TargetRelation.FRIEND));
     }
