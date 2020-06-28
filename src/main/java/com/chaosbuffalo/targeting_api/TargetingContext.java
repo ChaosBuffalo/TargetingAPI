@@ -1,5 +1,6 @@
 package com.chaosbuffalo.targeting_api;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 
@@ -12,6 +13,7 @@ public class TargetingContext {
     private final boolean canBeCreative;
     private final Class<? extends Entity> clazz;
     private final BiPredicate<Entity, Entity> targetTest;
+    private final String locKey;
 
     protected boolean isValidClass(Entity target) {
         return clazz.isInstance(target);
@@ -27,6 +29,10 @@ public class TargetingContext {
 
     public boolean canTargetCaster() {
         return canTargetCaster;
+    }
+
+    public String getLocalizedDescription(){
+        return I18n.format(locKey);
     }
 
     public boolean isValidTarget(Entity caster, Entity target) {
@@ -64,6 +70,7 @@ public class TargetingContext {
         this.canBeCreative = builder.canBeCreative;
         this.canBeSpectator = builder.canBeSpectator;
         this.targetTest = builder.targetTest;
+        this.locKey = builder.locKey;
     }
 
     public static class Builder {
@@ -73,11 +80,13 @@ public class TargetingContext {
         private boolean canBeCreative;
         private final Class<? extends Entity> clazz;
         private BiPredicate<Entity, Entity> targetTest;
+        private String locKey;
 
         public Builder(Class<? extends Entity> clazz) {
             this.clazz = clazz;
             canTargetCaster = true;
             requiresAlive = true;
+            locKey = "targeting_api.targeting_context.default";
         }
 
         public Builder(TargetingContext existing) {
@@ -87,6 +96,7 @@ public class TargetingContext {
             canBeSpectator = existing.canBeSpectator;
             clazz = existing.clazz;
             targetTest = existing.targetTest;
+            locKey = existing.locKey;
         }
 
         public Builder canTargetCaster(boolean allow) {
@@ -96,6 +106,11 @@ public class TargetingContext {
 
         public Builder requiresTargetAlive(boolean allow) {
             requiresAlive = allow;
+            return this;
+        }
+
+        public Builder setLocalizationKey(String key){
+            locKey = key;
             return this;
         }
 
