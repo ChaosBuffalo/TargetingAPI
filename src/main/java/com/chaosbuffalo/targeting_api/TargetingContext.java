@@ -6,89 +6,124 @@ import net.minecraft.entity.player.PlayerEntity;
 import java.util.function.BiPredicate;
 
 public class TargetingContext {
-    private boolean acceptSelf;
-    private boolean requiresAlive;
-    private boolean canBeSpectator;
-    private boolean canBeCreative;
+    private final boolean canTargetCaster;
+    private final boolean requiresAlive;
+    private final boolean canBeSpectator;
+    private final boolean canBeCreative;
     private final Class<? extends Entity> clazz;
-    private BiPredicate<Entity, Entity> targetTest;
+    private final BiPredicate<Entity, Entity> targetTest;
 
-    protected boolean isValidClass(Entity target){
+    protected boolean isValidClass(Entity target) {
         return clazz.isInstance(target);
     }
 
-    protected <T extends Entity> TargetingContext(Class<T> clazz, boolean requiresAlive,
-                                                  boolean acceptSelf, boolean canBeCreative,
-                                                  boolean canBeSpectator, BiPredicate<Entity, Entity> targetTest){
-        this.clazz = clazz;
-        this.requiresAlive = requiresAlive;
-        this.acceptSelf = acceptSelf;
-        this.canBeCreative = canBeCreative;
-        this.canBeSpectator = canBeSpectator;
-        this.targetTest = targetTest;
+    public boolean canBeCreative() {
+        return canBeCreative;
     }
 
-    public <T extends Entity> TargetingContext(Class<T> clazz, BiPredicate<Entity, Entity> targetTest){
-        this(clazz, true, targetTest);
+    public boolean canBeSpectator() {
+        return canBeSpectator;
     }
 
-
-    public TargetingContext(TargetingContext context){
-        this(context.clazz, context.requiresAlive, context.acceptSelf, context.canBeCreative,
-                context.canBeSpectator, context.targetTest);
-    }
-
-    public TargetingContext setCanBeCreative(boolean canBeCreative) {
-        this.canBeCreative = canBeCreative;
-        return this;
-    }
-
-    public TargetingContext setCanBeSpectator(boolean canBeSpectator) {
-        this.canBeSpectator = canBeSpectator;
-        return this;
-    }
-
-    public TargetingContext setAcceptSelf(boolean acceptSelf) {
-        this.acceptSelf = acceptSelf;
-        return this;
-    }
-
-    public TargetingContext setRequiresAlive(boolean requiresAlive) {
-        this.requiresAlive = requiresAlive;
-        return this;
-    }
-
-    public TargetingContext setTargetTest(BiPredicate<Entity, Entity> targetTest) {
-        this.targetTest = targetTest;
-        return this;
-    }
-
-    protected <T extends Entity> TargetingContext(Class<T> clazz, boolean acceptSelf, BiPredicate<Entity, Entity> targetTest){
-        this(clazz, true, acceptSelf, false, false, targetTest);
+    public boolean canTargetCaster() {
+        return canTargetCaster;
     }
 
     public boolean isValidTarget(Entity caster, Entity target) {
         if (caster == null || target == null) {
             return false;
         }
-        if (!isValidClass(target)){
-            return false;
-        }
-        if (!acceptSelf && Targeting.areEntitiesEqual(caster, target)){
-            return false;
-        }
-        if (requiresAlive && !target.isAlive()){
+
+        if (!isValidClass(target)) {
             return false;
         }
 
-        if (!canBeSpectator && target.isSpectator()){
+        if (!canTargetCaster && Targeting.areEntitiesEqual(caster, target)) {
             return false;
         }
 
-        if (!canBeCreative && target instanceof PlayerEntity && ((PlayerEntity) target).isCreative()){
+        if (requiresAlive && !target.isAlive()) {
+            return false;
+        }
+
+        if (!canBeSpectator && target.isSpectator()) {
+            return false;
+        }
+
+        if (!canBeCreative && target instanceof PlayerEntity && ((PlayerEntity) target).isCreative()) {
             return false;
         }
 
         return targetTest.test(caster, target);
+    }
+
+    private TargetingContext(Builder builder) {
+        this.clazz = builder.clazz;
+        this.requiresAlive = builder.requiresAlive;
+        this.canTargetCaster = builder.canTargetCaster;
+        this.canBeCreative = builder.canBeCreative;
+        this.canBeSpectator = builder.canBeSpectator;
+        this.targetTest = builder.targetTest;
+    }
+
+    public static class Builder {
+        private boolean canTargetCaster;
+        private boolean requiresAlive;
+        private boolean canBeSpectator;
+        private boolean canBeCreative;
+        private final Class<? extends Entity> clazz;
+        private BiPredicate<Entity, Entity> targetTest;
+
+        public Builder(Class<? extends Entity> clazz) {
+            this.clazz = clazz;
+            canTargetCaster = true;
+            requiresAlive = true;
+        }
+
+        public Builder(TargetingContext existing) {
+            canTargetCaster = existing.canTargetCaster;
+            requiresAlive = existing.requiresAlive;
+            canBeCreative = existing.canBeCreative;
+            canBeSpectator = existing.canBeSpectator;
+            clazz = existing.clazz;
+            targetTest = existing.targetTest;
+        }
+
+        public Builder canTargetCaster(boolean allow) {
+            canTargetCaster = allow;
+            return this;
+        }
+
+        public Builder requiresTargetAlive(boolean allow) {
+            requiresAlive = allow;
+            return this;
+        }
+
+        public Builder canTargetSpectators(boolean allow) {
+            canBeSpectator = allow;
+            return this;
+        }
+
+        public Builder canTargetCreative(boolean allow) {
+            canBeCreative = allow;
+            return this;
+        }
+
+        public Builder setTargetTest(BiPredicate<Entity, Entity> test) {
+            this.targetTest = test;
+            return this;
+        }
+
+        public TargetingContext build() {
+            return new TargetingContext(this);
+        }
+
+        public static Builder create(Class<? extends Entity> classFilter) {
+            return new TargetingContext.Builder(classFilter);
+        }
+
+        public static Builder from(TargetingContext existing) {
+            return new TargetingContext.Builder(existing);
+        }
     }
 }

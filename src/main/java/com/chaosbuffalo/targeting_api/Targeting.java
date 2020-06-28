@@ -1,18 +1,16 @@
 package com.chaosbuffalo.targeting_api;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.scoreboard.Team;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.function.BiFunction;
 
 public class Targeting {
 
-
-    private static final ArrayList<BiFunction<Entity, Entity, TargetRelation>> relationCallbacks =
-            new ArrayList<>();
-
+    private static final List<BiFunction<Entity, Entity, TargetRelation>> relationCallbacks = new ArrayList<>();
 
     public enum TargetRelation {
         FRIEND,
@@ -25,10 +23,20 @@ public class Targeting {
         return first != null && second != null && first.getUniqueID().compareTo(second.getUniqueID()) == 0;
     }
 
-    public static TargetRelation getTargetRelation(Entity source, Entity target){
-        for (BiFunction<Entity, Entity, TargetRelation> func : relationCallbacks){
+    public static TargetRelation getTargetRelation(Entity source, Entity target) {
+        // can't be enemy with self
+        if (areEntitiesEqual(source, target)) {
+            return TargetRelation.FRIEND;
+        }
+
+        // can't be enemy with entities on same team
+        if (source.isOnSameTeam(target)) {
+            return TargetRelation.FRIEND;
+        }
+
+        for (BiFunction<Entity, Entity, TargetRelation> func : relationCallbacks) {
             TargetRelation result = func.apply(source, target);
-            if (result != TargetRelation.UNHANDLED){
+            if (result != TargetRelation.UNHANDLED) {
                 return result;
             }
         }
@@ -44,142 +52,49 @@ public class Targeting {
         return context.isValidTarget(caster, target);
     }
 
-
-    private static boolean isSameTeam(Entity caster, Entity target) {
-        Team myTeam = caster.getTeam();
-        Team otherTeam = target.getTeam();
-        return myTeam != null && otherTeam != null && myTeam.isSameTeam(otherTeam);
-    }
-
-
-    private static boolean isPlayerControlled(Entity target) {
-        Entity controller = target.getControllingPassenger();
-        if (controller instanceof PlayerEntity) {
-            return true;
+    private static Entity getRootEntity(Entity source) {
+        Entity controller = source.getControllingPassenger();
+        if (controller != null) {
+            return getRootEntity(controller);
         }
-        if (target instanceof TameableEntity) {
-            TameableEntity ownable = (TameableEntity) target;
-            if (ownable.getOwnerId() != null) {
-                // Entity is owned, but the owner is offline
-                // If the owner if offline then there's not much we can do.
-                return true;
-            }
-        }
-        return false;
-    }
 
-
-
-    private static boolean targetIsPlayerControlled(Entity caster, Entity target,
-                                                    BiFunction<Entity, Entity, Boolean> test){
-        Entity controller = target.getControllingPassenger();
-        if (controller instanceof PlayerEntity) {
-            return test.apply(caster, controller);
-        }
-        if (target instanceof TameableEntity) {
-            TameableEntity ownable = (TameableEntity) target;
-
-            Entity owner = ownable.getOwner();
+        if (source instanceof TameableEntity) {
+            TameableEntity owned = (TameableEntity) source;
+            Entity owner = owned.getOwner();
             if (owner != null) {
-                // Owner is online, perform the normal checks
-                return test.apply(caster, owner);
-            } else if (ownable.getOwnerId() != null) {
+                // Owner is online, so use it for relationship checks
+                return getRootEntity(owner);
+            } else if (owned.getOwnerId() != null) {
                 // Entity is owned, but the owner is offline
                 // If the owner if offline then there's not much we can do.
-                return false;
+                return source;
             }
         }
 
-        return false;
+        return source;
     }
 
-    private static boolean casterIsPlayerControlled(Entity caster, Entity target,
-                                                    BiFunction<Entity, Entity, Boolean> test){
-        Entity controller = caster.getControllingPassenger();
-        if (controller instanceof PlayerEntity) {
-            return test.apply(controller, target);
-        }
+    static boolean validCheck(Entity caster, Entity target, EnumSet<TargetRelation> relations) {
+        Entity casterRoot = getRootEntity(caster);
+        Entity targetRoot = getRootEntity(target);
 
-        if (target instanceof TameableEntity) {
-            TameableEntity ownable = (TameableEntity) target;
-            Entity owner = ownable.getOwner();
-            if (owner != null) {
-                // Owner is online, perform the normal checks
-                return test.apply(owner, target);
-            } else if (ownable.getOwnerId() != null) {
-                // Entity is owned, but the owner is offline
-                // If the owner if offline then there's not much we can do.
-                // return true so that we consider everyone our friend
-                return true;
-            }
-        }
-
-        return false;
+        TargetRelation relation = getTargetRelation(casterRoot, targetRoot);
+        return relations.contains(relation);
     }
 
-
-    private static boolean checkIndirectEnemy(Entity caster, Entity target){
-        // can't be enemy with self
-        if (areEntitiesEqual(caster, target)){
-            return false;
-        }
-
-        // can't be enemy with entities on same team
-        if (isSameTeam(caster, target)){
-            return false;
-        }
-
-        if (targetIsPlayerControlled(caster, target, Targeting::isValidEnemy)){
-            return true;
-        }
-
-        return casterIsPlayerControlled(caster, target, Targeting::isValidEnemy);
-    }
-
-
-    private static boolean checkIndirectFriendly(Entity caster, Entity target){
-        // Always friendly with ourselves
-        if (areEntitiesEqual(caster, target)) {
-            return true;
-        }
-
-        // Always friendly with entities on the same team
-        if (isSameTeam(caster, target)) {
-            return true;
-        }
-
-        if (targetIsPlayerControlled(caster, target, Targeting::isValidFriendly))
-            return true;
-
-        return casterIsPlayerControlled(caster, target, Targeting::isValidFriendly);
+    public static boolean allowAny(Entity caster, Entity target) {
+        return true;
     }
 
     public static boolean isValidFriendly(Entity caster, Entity target) {
-
-        if (checkIndirectFriendly(caster, target)){
-            return true;
-        }
-
-        TargetRelation relation = getTargetRelation(caster, target);
-        return relation == TargetRelation.FRIEND;
+        return validCheck(caster, target, EnumSet.of(TargetRelation.FRIEND));
     }
 
     public static boolean isValidEnemy(Entity caster, Entity target) {
-        if (checkIndirectEnemy(caster, target)){
-            return true;
-        }
-
-        TargetRelation relation = getTargetRelation(caster, target);
-        return relation == TargetRelation.ENEMY;
+        return validCheck(caster, target, EnumSet.of(TargetRelation.ENEMY));
     }
 
-    public static boolean isValidNeutral(Entity caster, Entity target){
-        if (checkIndirectFriendly(caster, target) || checkIndirectEnemy(caster, target)){
-            return false;
-        }
-
-        TargetRelation relation = getTargetRelation(caster, target);
-        return relation == TargetRelation.NEUTRAL || relation == TargetRelation.UNHANDLED;
+    public static boolean isValidNeutral(Entity caster, Entity target) {
+        return validCheck(caster, target, EnumSet.of(TargetRelation.NEUTRAL, TargetRelation.UNHANDLED));
     }
-
 }
