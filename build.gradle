@@ -43,7 +43,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                examplemod {
+                targeting_api {
                     source sourceSets.main
                 }
             }
@@ -59,7 +59,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                examplemod {
+                targeting_api {
                     source sourceSets.main
                 }
             }
@@ -77,7 +77,7 @@ minecraft {
             args '--mod', 'targeting_api', '--all', '--output', file('src/generated/resources/')
 
             mods {
-                examplemod {
+                targeting_api {
                     source sourceSets.main
                 }
             }
@@ -135,6 +135,7 @@ jar.finalizedBy('reobfJar')
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            artifactId jar.baseName
             artifact jar
         }
     }
