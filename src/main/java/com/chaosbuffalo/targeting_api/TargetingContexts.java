@@ -2,10 +2,8 @@ package com.chaosbuffalo.targeting_api;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraftforge.fml.common.Mod;
 
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class TargetingContexts {
     public static TargetingContext ALL = TargetingContext.Builder.create(LivingEntity.class)
             .setTargetTest(Targeting::allowAny)
