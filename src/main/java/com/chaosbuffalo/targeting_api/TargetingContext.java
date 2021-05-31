@@ -1,8 +1,8 @@
 package com.chaosbuffalo.targeting_api;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.function.BiPredicate;
 
@@ -31,8 +31,8 @@ public class TargetingContext {
         return canTargetCaster;
     }
 
-    public String getLocalizedDescription(){
-        return I18n.format(locKey);
+    public TranslationTextComponent getLocalizedDescription() {
+        return new TranslationTextComponent(locKey);
     }
 
     public boolean isValidTarget(Entity caster, Entity target) {
@@ -109,7 +109,7 @@ public class TargetingContext {
             return this;
         }
 
-        public Builder setLocalizationKey(String key){
+        public Builder setLocalizationKey(String key) {
             locKey = key;
             return this;
         }

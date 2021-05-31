@@ -2,6 +2,7 @@ package com.chaosbuffalo.targeting_api;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.TameableEntity;
+import net.minecraft.util.EntityPredicates;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -29,6 +30,10 @@ public class Targeting {
             return TargetRelation.FRIEND;
         }
 
+        if (!EntityPredicates.CAN_AI_TARGET.test(target))
+        {
+            return TargetRelation.UNHANDLED;
+        }
         // can't be enemy with entities on same team
         if (source.isOnSameTeam(target)) {
             return TargetRelation.FRIEND;
