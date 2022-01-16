@@ -24,14 +24,19 @@ public class Targeting {
         return first != null && second != null && first.getUniqueID().compareTo(second.getUniqueID()) == 0;
     }
 
+    static TargetRelation defaultRelationCheck(Entity source, Entity target) {
+        return target.getClassification(false).getPeacefulCreature() ?
+                Targeting.TargetRelation.FRIEND :
+                Targeting.TargetRelation.ENEMY;
+    }
+
     public static TargetRelation getTargetRelation(Entity source, Entity target) {
         // can't be enemy with self
         if (areEntitiesEqual(source, target)) {
             return TargetRelation.FRIEND;
         }
 
-        if (!EntityPredicates.CAN_AI_TARGET.test(target))
-        {
+        if (!EntityPredicates.CAN_AI_TARGET.test(target)) {
             return TargetRelation.UNHANDLED;
         }
         // can't be enemy with entities on same team
@@ -39,11 +44,15 @@ public class Targeting {
             return TargetRelation.FRIEND;
         }
 
-        for (BiFunction<Entity, Entity, TargetRelation> func : relationCallbacks) {
-            TargetRelation result = func.apply(source, target);
-            if (result != TargetRelation.UNHANDLED) {
-                return result;
+        if (relationCallbacks.size() > 0) {
+            for (BiFunction<Entity, Entity, TargetRelation> func : relationCallbacks) {
+                TargetRelation result = func.apply(source, target);
+                if (result != TargetRelation.UNHANDLED) {
+                    return result;
+                }
             }
+        } else {
+            return defaultRelationCheck(source, target);
         }
         return TargetRelation.UNHANDLED;
     }
@@ -51,7 +60,6 @@ public class Targeting {
     public static void registerRelationCallback(BiFunction<Entity, Entity, TargetRelation> callback) {
         relationCallbacks.add(callback);
     }
-
 
     public static boolean isValidTarget(TargetingContext context, Entity caster, Entity target) {
         return context.isValidTarget(caster, target);
