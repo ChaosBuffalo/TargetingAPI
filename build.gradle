@@ -7,10 +7,22 @@ buildscript {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
     }
 }
+plugins {
+    id "com.google.cloud.artifactregistry.gradle-plugin" version "2.1.5"
+}
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
+
+
+
+repositories {
+    maven {
+        url "artifactregistry://us-central1-maven.pkg.dev/secure-garden-352216/chaosbuffalo-maven-repo"
+    }
+}
+
 
 version = "${mod_version}"
 group = "${mod_group}" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -175,15 +187,21 @@ jar.finalizedBy('reobfJar')
 //publish.dependsOn('reobfJar')
 
 publishing {
+    repositories {
+        maven {
+            url "artifactregistry://us-central1-maven.pkg.dev/secure-garden-352216/chaosbuffalo-maven-repo"
+        }
+    }
+
     publications {
         mavenJava(MavenPublication) {
             artifactId jar.baseName
             artifact jar
         }
     }
-    repositories {
-        maven {
-            url "file:///${project.projectDir}/mcmodsrepo"
-        }
-    }
+//    repositories {
+//        maven {
+//            url "file:///${project.projectDir}/mcmodsrepo"
+//        }
+//    }
 }
