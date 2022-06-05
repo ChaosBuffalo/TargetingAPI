@@ -27,9 +27,9 @@ jobs:
 
     - name: Increment Version
       run: ./gradlew incrementVersion --versionIncrementType=PATCH --versionIncrementBranch=master
-        env:
-          gitUserEmail: ${{ secrets.GIT_USER_EMAIL }}
-          gitUserName: ${{ secrets.GIT_USER_NAME }}
+      env:
+        gitUserEmail: ${{ secrets.GIT_USER_EMAIL }}
+        gitUserName: ${{ secrets.GIT_USER_NAME }}
 
     - name: Build with gradle
       run: gradle publish
