@@ -5,20 +5,7 @@ on:
     branches: [ master ]
 
 jobs:
-  incrementVersion:
-    runs-on: ubuntu-latest
-    steps:
-      # https://github.com/marketplace/actions/checkout
-      - uses: actions/checkout@v3
-      # https://github.com/actions/setup-java
-      - uses: actions/setup-java@v2
-        with:
-          distribution: 'adopt'
-          java-version: '8'
-
-    
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -37,10 +24,12 @@ jobs:
       with:
         java-version: '8'
         distribution: 'adopt'
+
     - name: Increment Version
-      - run: ./gradlew incrementVersion --versionIncrementType=PATCH --versionIncrementBranch=master
+      run: ./gradlew incrementVersion --versionIncrementType=PATCH --versionIncrementBranch=master
         env:
           gitUserEmail: ${{ secrets.GIT_USER_EMAIL }}
           gitUserName: ${{ secrets.GIT_USER_NAME }}
+
     - name: Build with gradle
       run: gradle publish
