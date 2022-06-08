@@ -37,5 +37,5 @@ jobs:
         gitUserEmail: ${{ secrets.GIT_USER_EMAIL }}
         gitUserName: ${{ secrets.GIT_USER_NAME }}
 
-    - name: Build with gradle
+    - name: Publish to Maven
       run: gradle publish
