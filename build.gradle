@@ -27,6 +27,9 @@ repositories {
 
 
 version = "0.27.3"
+if (System.getenv().RELEASE_MODE == null) {
+    version += '-SNAPSHOT'
+}
 group = "${mod_group}" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "${mod_id}-${mc_version}"
 
