@@ -13,6 +13,6 @@ public class TargetingAPI {
     public static final String MODID = "targeting_api";
 
     public TargetingAPI() {
-
+        // do a line change in source to test ci
     }
 }
