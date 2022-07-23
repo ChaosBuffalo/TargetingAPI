@@ -5,13 +5,28 @@ import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.util.EntityPredicates;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.BiFunction;
 
 public class Targeting {
 
-    private static final List<BiFunction<Entity, Entity, TargetRelation>> relationCallbacks = new ArrayList<>();
+    private static final List<TargetRelationCallback> relationCallbacks = new ArrayList<>();
+
+    protected static class TargetRelationCallback {
+        BiFunction<Entity, Entity, TargetRelation> func;
+        int priority;
+
+        TargetRelationCallback(BiFunction<Entity, Entity, TargetRelation> func, int priority) {
+            this.func = func;
+            this.priority = priority;
+        }
+
+        public int getPriority() {
+            return priority;
+        }
+    }
 
     public enum TargetRelation {
         FRIEND,
@@ -32,6 +47,10 @@ public class Targeting {
 
     public static TargetRelation getTargetRelation(Entity source, Entity target) {
         // can't be enemy with self
+        //need to handle null
+        if (source == null || target == null) {
+            return TargetRelation.NEUTRAL;
+        }
         if (areEntitiesEqual(source, target)) {
             return TargetRelation.FRIEND;
         }
@@ -45,8 +64,8 @@ public class Targeting {
         }
 
         if (relationCallbacks.size() > 0) {
-            for (BiFunction<Entity, Entity, TargetRelation> func : relationCallbacks) {
-                TargetRelation result = func.apply(source, target);
+            for (TargetRelationCallback func : relationCallbacks) {
+                TargetRelation result = func.func.apply(source, target);
                 if (result != TargetRelation.UNHANDLED) {
                     return result;
                 }
@@ -58,7 +77,13 @@ public class Targeting {
     }
 
     public static void registerRelationCallback(BiFunction<Entity, Entity, TargetRelation> callback) {
-        relationCallbacks.add(callback);
+        relationCallbacks.add(new TargetRelationCallback(callback, 10));
+        relationCallbacks.sort(Comparator.comparingInt(TargetRelationCallback::getPriority));
+    }
+
+    public static void registerRelationCallback(BiFunction<Entity, Entity, TargetRelation> callback, int priority) {
+        relationCallbacks.add(new TargetRelationCallback(callback, priority));
+        relationCallbacks.sort(Comparator.comparingInt(TargetRelationCallback::getPriority));
     }
 
     public static boolean isValidTarget(TargetingContext context, Entity caster, Entity target) {
