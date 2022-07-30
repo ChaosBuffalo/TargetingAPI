@@ -28,7 +28,7 @@ repositories {
 ext {
     base_version = "default"
 }
-version = "0.27.6"
+version = "0.27.7"
 base_version = version;
 if (System.getenv().RELEASE_MODE == null) {
     version += '-SNAPSHOT'
