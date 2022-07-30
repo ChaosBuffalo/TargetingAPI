@@ -46,11 +46,18 @@ public class Targeting {
     }
 
     public static TargetRelation getTargetRelation(Entity source, Entity target) {
+        Entity sourceRoot = getRootEntity(source);
+        Entity targetRoot = getRootEntity(target);
+        return getTargetRelationInternal(sourceRoot, targetRoot);
+    }
+
+    private static TargetRelation getTargetRelationInternal(Entity source, Entity target) {
         // can't be enemy with self
         //need to handle null
         if (source == null || target == null) {
             return TargetRelation.NEUTRAL;
         }
+
         if (areEntitiesEqual(source, target)) {
             return TargetRelation.FRIEND;
         }
@@ -109,6 +116,13 @@ public class Targeting {
             }
         }
 
+        if (source instanceof ITargetingOwner) {
+            Entity owner = ((ITargetingOwner) source).getTargetingOwner();
+            if (owner != null) {
+                return getRootEntity(owner);
+            }
+        }
+
         return source;
     }
 
@@ -116,7 +130,7 @@ public class Targeting {
         Entity casterRoot = getRootEntity(caster);
         Entity targetRoot = getRootEntity(target);
 
-        TargetRelation relation = getTargetRelation(casterRoot, targetRoot);
+        TargetRelation relation = getTargetRelationInternal(casterRoot, targetRoot);
         return relations.contains(relation);
     }
 
