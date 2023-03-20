@@ -1,8 +1,8 @@
 package com.chaosbuffalo.targeting_api;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.function.BiPredicate;
 
@@ -31,8 +31,8 @@ public class TargetingContext {
         return canTargetCaster;
     }
 
-    public TranslationTextComponent getLocalizedDescription() {
-        return new TranslationTextComponent(locKey);
+    public TranslatableComponent getLocalizedDescription() {
+        return new TranslatableComponent(locKey);
     }
 
     public boolean isValidTarget(Entity caster, Entity target) {
@@ -56,7 +56,7 @@ public class TargetingContext {
             return false;
         }
 
-        if (!canBeCreative && target instanceof PlayerEntity && ((PlayerEntity) target).isCreative()) {
+        if (!canBeCreative && target instanceof Player && ((Player) target).isCreative()) {
             return false;
         }
 

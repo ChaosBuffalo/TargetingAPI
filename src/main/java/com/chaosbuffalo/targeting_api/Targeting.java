@@ -1,8 +1,8 @@
 package com.chaosbuffalo.targeting_api;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.util.EntityPredicates;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.EntitySelector;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,11 +36,11 @@ public class Targeting {
     }
 
     public static boolean areEntitiesEqual(Entity first, Entity second) {
-        return first != null && second != null && first.getUniqueID().compareTo(second.getUniqueID()) == 0;
+        return first != null && second != null && first.getUUID().compareTo(second.getUUID()) == 0;
     }
 
     static TargetRelation defaultRelationCheck(Entity source, Entity target) {
-        return target.getClassification(false).getPeacefulCreature() ?
+        return target.getClassification(false).isFriendly() ?
                 Targeting.TargetRelation.FRIEND :
                 Targeting.TargetRelation.ENEMY;
     }
@@ -62,11 +62,11 @@ public class Targeting {
             return TargetRelation.FRIEND;
         }
 
-        if (!EntityPredicates.CAN_AI_TARGET.test(target)) {
+        if (!EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(target)) {
             return TargetRelation.UNHANDLED;
         }
         // can't be enemy with entities on same team
-        if (source.isOnSameTeam(target)) {
+        if (source.isAlliedTo(target)) {
             return TargetRelation.FRIEND;
         }
 
@@ -103,13 +103,13 @@ public class Targeting {
             return getRootEntity(controller);
         }
 
-        if (source instanceof TameableEntity) {
-            TameableEntity owned = (TameableEntity) source;
+        if (source instanceof TamableAnimal) {
+            TamableAnimal owned = (TamableAnimal) source;
             Entity owner = owned.getOwner();
             if (owner != null) {
                 // Owner is online, so use it for relationship checks
                 return getRootEntity(owner);
-            } else if (owned.getOwnerId() != null) {
+            } else if (owned.getOwnerUUID() != null) {
                 // Entity is owned, but the owner is offline
                 // If the owner if offline then there's not much we can do.
                 return source;

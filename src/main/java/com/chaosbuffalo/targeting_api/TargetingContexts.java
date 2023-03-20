@@ -1,7 +1,7 @@
 package com.chaosbuffalo.targeting_api;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 
 
 public class TargetingContexts {
@@ -13,7 +13,7 @@ public class TargetingContexts {
             .canTargetCaster(false)
             .setLocalizationKey("targeting_api.targeting_context.all_around")
             .build();
-    public static TargetingContext PLAYERS = TargetingContext.Builder.create(PlayerEntity.class)
+    public static TargetingContext PLAYERS = TargetingContext.Builder.create(Player.class)
             .setTargetTest(Targeting::allowAny)
             .setLocalizationKey("targeting_api.targeting_context.players")
             .build();

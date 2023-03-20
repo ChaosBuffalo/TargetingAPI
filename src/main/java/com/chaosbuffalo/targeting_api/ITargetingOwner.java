@@ -1,6 +1,6 @@
 package com.chaosbuffalo.targeting_api;
 
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 
 import javax.annotation.Nullable;
 
